@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+import java.util.Collections;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,10 +21,12 @@ public abstract class MapObject extends SpriteView {
         }
         @Override
         public void visit(Shepherd s) {
-            Stream.iterate(Color.RED, c -> Color.hsb(c.getHue() + .1, c.getSaturation(), c.getBrightness()));
+            SpriteView tail = s.getAnimals().isEmpty() ?
+                s : s.getAnimals().get(s.getAnimals().size() - 1);
 
-            SpriteView tail = s.getAnimals().isEmpty() ? s : s.getAnimals().get(s.getAnimals().size() - 1);
-            s.getAnimals().addAll(Stream.iterate(tail, SpriteView.Lamb::new).substream(1, 8).collect(Collectors.toList()));
+            Stream.iterate(tail, SpriteView.Lamb::new)
+                .substream(1, 8)
+                .forEach(s.getAnimals()::add);
         }
     }
 
@@ -35,10 +38,18 @@ public abstract class MapObject extends SpriteView {
         }
         @Override
         public void visit(Shepherd s) {
-            s.getAnimals().stream().filter(a -> a.getNumber() % 4 == 1).forEach(a -> a.setColor(null));
-            s.getAnimals().stream().filter(a -> a.getNumber() % 4 == 2).forEach(a -> a.setColor(Color.YELLOW));
-            s.getAnimals().stream().filter(a -> a.getNumber() % 4 == 3).forEach(a -> a.setColor(Color.CYAN));
-            s.getAnimals().stream().filter(a -> a.getNumber() % 4 == 0).forEach(a -> a.setColor(Color.GREEN));
+            s.getAnimals().stream()
+                .filter(a -> a.getNumber() % 4 == 1)
+                .forEach(a -> a.setColor(null));
+            s.getAnimals().stream()
+                .filter(a -> a.getNumber() % 4 == 2)
+                .forEach(a -> a.setColor(Color.YELLOW));
+            s.getAnimals().stream()
+                .filter(a -> a.getNumber() % 4 == 3)
+                .forEach(a -> a.setColor(Color.CYAN));
+            s.getAnimals().stream()
+                .filter(a -> a.getNumber() % 4 == 0)
+                .forEach(a -> a.setColor(Color.GREEN));
         }
     }
 
@@ -57,8 +68,13 @@ public abstract class MapObject extends SpriteView {
         }
         @Override
         public void visit(Shepherd s) {
-            Predicate<SpriteView> pure = a -> a.getColor() == null;
-            mealsServed.set(mealsServed.get() + s.getAnimals().filtered(pure).size());
+            Predicate<SpriteView> pure =
+                a -> a.getColor() == null;
+
+            mealsServed.set(mealsServed.get() +
+                s.getAnimals().filtered(pure).size()
+            );
+
             s.getAnimals().removeIf(pure);
         }
     }
@@ -72,9 +88,17 @@ public abstract class MapObject extends SpriteView {
         @Override
         public void visit(Shepherd s) {
             // single map:
-            s.getAnimals().setAll(s.getAnimals().stream().map(sv -> new Eggs(sv.getFollowing())).collect(Collectors.toList()));
+//            s.getAnimals().setAll(s.getAnimals()
+//                .stream()
+//                .map(sv -> new Eggs(sv.getFollowing())
+//            ).collect(Collectors.toList()));
             // or a double map:
-            // s.getAnimals().setAll(s.getAnimals().stream().map(SpriteView::getFollowing).map(Eggs::new).collect(Collectors.toList()));
+            s.getAnimals().setAll(s.getAnimals()
+                .stream().parallel()
+                .map(SpriteView::getFollowing)
+                .map(Eggs::new)
+                .collect(Collectors.toList())
+            );
         }
     }
 
@@ -86,7 +110,11 @@ public abstract class MapObject extends SpriteView {
         }
         @Override
         public void visit(Shepherd s) {
-            s.getAnimals().setAll(s.getAnimals().stream().flatMap(SpriteView.Eggs::hatch).collect(Collectors.toList()));
+            s.getAnimals().setAll(s.getAnimals()
+                .stream().parallel()
+                .flatMap(SpriteView.Eggs::hatch)
+                .collect(Collectors.toList())
+            );
         }
     }
 
@@ -99,7 +127,11 @@ public abstract class MapObject extends SpriteView {
         }
         @Override
         public void visit(Shepherd shepherd) {
-            Double mealSize = shepherd.getAnimals().stream().map(SpriteView::getScaleX).reduce(0.0, Double::sum);
+            Double mealSize = shepherd.getAnimals()
+                .stream()
+                .map(SpriteView::getScaleX)
+                .reduce(0.0, Double::sum);
+
             setScaleX(getScaleX() + mealSize * .2);
             setScaleY(getScaleY() + mealSize * .2);
             shepherd.getAnimals().clear();

@@ -32,11 +32,17 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         populateBackground(root);
 
+        // This shows object generation:
         root.getChildren().add(new MapObject.Barn(new Location(2, 3)));
+        // This one shows filtering
         root.getChildren().add(new MapObject.Rainbow(new Location(5, 0)));
+        // This one demonstrates the additions to the List API:
         root.getChildren().add(new MapObject.Church(new Location(6, 2)));
+        // This demonstrated Map:
         root.getChildren().add(new MapObject.ChickenCoop(new Location(5, 4)));
+        // And this one FlatMap:
         root.getChildren().add(new MapObject.Nest(new Location(3, 5)));
+        // And finally aggregation:
         MapObject.Fox fox = new MapObject.Fox(new Location(9, 4));
         fox.setDirection(Direction.LEFT);
         fox.setScaleX(.5);

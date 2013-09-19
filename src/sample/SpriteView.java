@@ -165,7 +165,6 @@ public class SpriteView extends StackPane {
             label.textProperty().bind(number.asString());
             label.setFont(Font.font("Impact", 12 * Main.SCALE));
             getChildren().add(label);
-            label.setEffect(new DropShadow(BlurType.ONE_PASS_BOX, Color.WHITESMOKE, 3 * Main.SCALE, .2, 0, 0));
         }
     }
 
