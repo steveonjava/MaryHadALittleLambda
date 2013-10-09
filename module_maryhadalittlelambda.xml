@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_maryhadalittlelambda" default="compile.module.maryhadalittlelambda">
+  <dirname property="module.maryhadalittlelambda.basedir" file="${ant.file.module_maryhadalittlelambda}"/>
+  
+  <property name="module.jdk.home.maryhadalittlelambda" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.maryhadalittlelambda" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.maryhadalittlelambda" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.maryhadalittlelambda" value="${compiler.args}"/>
+  
+  <property name="maryhadalittlelambda.output.dir" value="${module.maryhadalittlelambda.basedir}/out/production/MaryHadALittleLambda"/>
+  <property name="maryhadalittlelambda.testoutput.dir" value="${module.maryhadalittlelambda.basedir}/out/test/MaryHadALittleLambda"/>
+  
+  <path id="maryhadalittlelambda.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="maryhadalittlelambda.module.production.classpath">
+    <path refid="${module.jdk.classpath.maryhadalittlelambda}"/>
+  </path>
+  
+  <path id="maryhadalittlelambda.runtime.production.module.classpath">
+    <pathelement location="${maryhadalittlelambda.output.dir}"/>
+  </path>
+  
+  <path id="maryhadalittlelambda.module.classpath">
+    <path refid="${module.jdk.classpath.maryhadalittlelambda}"/>
+    <pathelement location="${maryhadalittlelambda.output.dir}"/>
+  </path>
+  
+  <path id="maryhadalittlelambda.runtime.module.classpath">
+    <pathelement location="${maryhadalittlelambda.testoutput.dir}"/>
+    <pathelement location="${maryhadalittlelambda.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.maryhadalittlelambda">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.maryhadalittlelambda">
+    <patternset refid="excluded.from.module.maryhadalittlelambda"/>
+  </patternset>
+  
+  <path id="maryhadalittlelambda.module.sourcepath">
+    <dirset dir="${module.maryhadalittlelambda.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.maryhadalittlelambda" depends="compile.module.maryhadalittlelambda.production,compile.module.maryhadalittlelambda.tests" description="Compile module MaryHadALittleLambda"/>
+  
+  <target name="compile.module.maryhadalittlelambda.production" description="Compile module MaryHadALittleLambda; production classes">
+    <mkdir dir="${maryhadalittlelambda.output.dir}"/>
+    <javac destdir="${maryhadalittlelambda.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.maryhadalittlelambda}/javac" includeAntRuntime="false">
+      <compilerarg line="${compiler.args.maryhadalittlelambda}"/>
+      <bootclasspath refid="maryhadalittlelambda.module.bootclasspath"/>
+      <classpath refid="maryhadalittlelambda.module.production.classpath"/>
+      <src refid="maryhadalittlelambda.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.maryhadalittlelambda"/>
+    </javac>
+    
+    <copy todir="${maryhadalittlelambda.output.dir}">
+      <fileset dir="${module.maryhadalittlelambda.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.maryhadalittlelambda.tests" depends="compile.module.maryhadalittlelambda.production" description="compile module MaryHadALittleLambda; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.maryhadalittlelambda" description="cleanup module">
+    <delete dir="${maryhadalittlelambda.output.dir}"/>
+    <delete dir="${maryhadalittlelambda.testoutput.dir}"/>
+  </target>
+</project>

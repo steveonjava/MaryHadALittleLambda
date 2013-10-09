@@ -1,11 +1,14 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
@@ -19,7 +22,7 @@ public class Main extends Application {
     static final int SPRITE_SIZE = 32;
     static final int CELL_SIZE = SPRITE_SIZE * SCALE;
     static final int HORIZONTAL_CELLS = 10;
-    static final int VERTICAL_CELLS = 7;
+    static final int VERTICAL_CELLS = 6;
     static final int BOARD_WIDTH = HORIZONTAL_CELLS * CELL_SIZE;
     static final int BOARD_HEIGHT = VERTICAL_CELLS * CELL_SIZE;
     static MapObject[][] map = new MapObject[HORIZONTAL_CELLS][VERTICAL_CELLS];
@@ -34,11 +37,11 @@ public class Main extends Application {
 
         // This shows object generation:
         root.getChildren().add(new MapObject.Barn(new Location(2, 3)));
-        // This one shows filtering
+//        This one shows filtering
         root.getChildren().add(new MapObject.Rainbow(new Location(5, 0)));
         // This one demonstrates the additions to the List API:
         root.getChildren().add(new MapObject.Church(new Location(6, 2)));
-        // This demonstrated Map:
+        // This demonstrates Map:
         root.getChildren().add(new MapObject.ChickenCoop(new Location(5, 4)));
         // And this one FlatMap:
         root.getChildren().add(new MapObject.Nest(new Location(3, 5)));
@@ -50,6 +53,7 @@ public class Main extends Application {
         root.getChildren().add(fox);
 
         SpriteView.Mary mary = new SpriteView.Mary(new Location(0, 3));
+        populateCells(root, mary);
         root.getChildren().add(mary);
         addKeyHandler(scene, mary);
 
@@ -60,23 +64,32 @@ public class Main extends Application {
         // Image by Victor Szalvay: http://www.flickr.com/photos/55502991@N00/172603855
         ImageView background = new ImageView(getClass().getResource("images/field.jpg").toString());
         background.setFitHeight(BOARD_HEIGHT);
+        root.getChildren().add(background);
 
-// Gratuitous use of lambdas to do nested iteration!
+    }
+    private void populateCells(Group root, final SpriteView.Mary mary) {
+        // Gratuitous use of lambdas to do nested iteration!
 //        for (int i = 0; i < HORIZONTAL_CELLS; i++) {
 //            for (int j = 0; j < VERTICAL_CELLS; j++) {
         Group cells = new Group(IntStream.range(0, HORIZONTAL_CELLS).mapToObj(i ->
             IntStream.range(0, VERTICAL_CELLS).mapToObj(j -> {
                 Rectangle rect = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-                rect.setFill(null);
+                rect.setFill(Color.rgb(0, 0, 0, 0));
                 rect.setStrokeType(StrokeType.INSIDE);
                 rect.setStroke(Color.BLACK);
-                rect.getStrokeDashArray().setAll(0.7 * CELL_SIZE / 4, 0.3 * CELL_SIZE / 4);
-                rect.setStrokeDashOffset(0.35 * CELL_SIZE / 4);
+// This is too slow on mobile devices
+//                rect.getStrokeDashArray().setAll(0.7 * CELL_SIZE / 4, 0.3 * CELL_SIZE / 4);
+//                rect.setStrokeDashOffset(0.35 * CELL_SIZE / 4);
+                rect.setOnMousePressed(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        mary.moveTo(new Location(i, j));
+                    }
+                });
                 return rect;
             })
         ).flatMap(s -> s).toArray(Rectangle[]::new));
-
-        root.getChildren().addAll(background, cells);
+        root.getChildren().addAll(cells);
     }
 
     private void addKeyHandler(Scene scene, SpriteView mary) {
@@ -99,6 +112,8 @@ public class Main extends Application {
                 case RIGHT:
                     mary.move(Direction.RIGHT);
                     break;
+                case ESCAPE:
+                    Platform.exit();
             }
         });
     }

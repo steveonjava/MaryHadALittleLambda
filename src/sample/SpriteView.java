@@ -179,6 +179,7 @@ public class SpriteView extends StackPane {
         this.following = following;
         setDirection(following.getDirection());
         following.followers.add(this);
+        setMouseTransparent(true);
     }
     public SpriteView getFollowing() {
         return following;
