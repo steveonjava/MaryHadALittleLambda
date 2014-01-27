@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -56,7 +57,7 @@ public class SpriteView extends StackPane {
         public Shepherd(Image spriteSheet, Main.Location loc) {
             super(spriteSheet, loc);
             animals = FXCollections.observableArrayList();
-            animals.addListener(c -> {
+            animals.addListener((ListChangeListener) c -> {
                 ObservableList<Node> children = ((Group) getParent()).getChildren();
                 while (c.next()) {
                     if (c.wasAdded() || c.wasRemoved() || c.wasReplaced()) {
@@ -153,7 +154,7 @@ public class SpriteView extends StackPane {
             if (!(sv instanceof Eggs)) {
                 return Stream.of(sv);
             }
-            return Stream.iterate(sv, Chicken::new).substream(1, 4);
+            return Stream.iterate(sv, Chicken::new).skip(1).limit(3);
         }
     }
 

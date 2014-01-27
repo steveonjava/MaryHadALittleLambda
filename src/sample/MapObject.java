@@ -25,7 +25,7 @@ public abstract class MapObject extends SpriteView {
                 s : s.getAnimals().get(s.getAnimals().size() - 1);
 
             Stream.iterate(tail, SpriteView.Lamb::new)
-                .substream(1, 8)
+                .skip(1).limit(7)
                 .forEach(s.getAnimals()::add);
         }
     }

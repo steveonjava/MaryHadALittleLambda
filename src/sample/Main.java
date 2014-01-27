@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 
 public class Main extends Application {
 
-    static final int SCALE = 3;
+    static final int SCALE = 4;
     static final int SPRITE_SIZE = 32;
     static final int CELL_SIZE = SPRITE_SIZE * SCALE;
     static final int HORIZONTAL_CELLS = 10;
@@ -37,7 +37,7 @@ public class Main extends Application {
 
         // This shows object generation:
         root.getChildren().add(new MapObject.Barn(new Location(2, 3)));
-//        This one shows filtering
+        // This one shows filtering
         root.getChildren().add(new MapObject.Rainbow(new Location(5, 0)));
         // This one demonstrates the additions to the List API:
         root.getChildren().add(new MapObject.Church(new Location(6, 2)));
