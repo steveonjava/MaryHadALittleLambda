@@ -1,5 +1,6 @@
 package sample;
 
+import com.sun.glass.ui.Application;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -68,8 +69,7 @@ public class SpriteView extends StackPane {
                         for (SpriteView a : animals) {
                             a.following = prev;
                             a.number.set(++number);
-                            prev.followers.clear();
-                            prev.followers.add(a);
+                            prev.follower = a;
                             prev = a;
                         }
                     }
@@ -81,6 +81,16 @@ public class SpriteView extends StackPane {
                     object.visit(this);
                 }
             };
+        }
+        public void move(Main.Direction direction) {
+            if (walking != null && walking.getStatus().equals(Animation.Status.RUNNING))
+                return;
+            moveTo(location.getValue().offset(direction.getXOffset(), direction.getYOffset()));
+            animals.stream().reduce(
+                location.get(),                (loc, sprt) -> {
+                    sprt.moveTo(loc);
+                    return sprt.location.get();
+                }, (loc1, loc2) -> loc1);
         }
     }
 
@@ -159,10 +169,9 @@ public class SpriteView extends StackPane {
     }
 
     public static class NumberedSpriteView extends SpriteView {
-        protected final Label label;
+        protected final Label label = new Label();
         public NumberedSpriteView(Image spriteSheet, SpriteView following) {
             super(spriteSheet, following);
-            label = new Label();
             label.textProperty().bind(number.asString());
             label.setFont(Font.font("Impact", 12 * Main.SCALE));
             getChildren().add(label);
@@ -179,7 +188,7 @@ public class SpriteView extends StackPane {
         number.set(following.number.get() + 1);
         this.following = following;
         setDirection(following.getDirection());
-        following.followers.add(this);
+        following.follower = this;
         setMouseTransparent(true);
     }
     public SpriteView getFollowing() {
@@ -192,7 +201,7 @@ public class SpriteView extends StackPane {
     int spriteWidth;
     int spriteHeight;
     Timeline walking;
-    List<SpriteView> followers = new ArrayList<>();
+    SpriteView follower;
 
     static Image loadImage(String url) {
         return new Image(SpriteView.class.getResource(url).toString(), Main.SPRITE_SIZE * 3 * Main.SCALE, Main.SPRITE_SIZE * 4 * Main.SCALE, true, false);
@@ -220,17 +229,9 @@ public class SpriteView extends StackPane {
         timeline.onFinishedProperty().setValue(e -> timeline.play());
         timeline.play();
     }
-    public void move(Main.Direction direction) {
-        if (walking != null && walking.getStatus().equals(Animation.Status.RUNNING))
-            return;
-        this.direction.set(direction);
-        moveTo(location.getValue().offset(direction.getXOffset(), direction.getYOffset()));
-    }
     public void moveTo(Main.Location loc) {
-        followers.forEach(f -> f.moveTo(location.getValue()));
-        direction.set(location.getValue().directionTo(loc));
-        location.setValue(loc);
         walking = new Timeline(Animation.INDEFINITE,
+            new KeyFrame(Duration.seconds(.01), new KeyValue(direction, location.getValue().directionTo(loc))),
             new KeyFrame(Duration.seconds(1), new KeyValue(translateXProperty(), loc.getX() * Main.CELL_SIZE)),
             new KeyFrame(Duration.seconds(1), new KeyValue(translateYProperty(), loc.getY() * Main.CELL_SIZE)),
             new KeyFrame(Duration.seconds(.25), new KeyValue(frame, 0)),
@@ -238,8 +239,13 @@ public class SpriteView extends StackPane {
             new KeyFrame(Duration.seconds(.75), new KeyValue(frame, 2)),
             new KeyFrame(Duration.seconds(1), new KeyValue(frame, 1))
         );
-        walking.setOnFinished(arrivalHandler);
-        walking.play();
+        walking.setOnFinished(e -> {
+            location.setValue(loc);
+            if (arrivalHandler != null) {
+                arrivalHandler.handle(e);
+            }
+        });
+        Application.invokeLater(walking::play);
     }
     public Main.Location getLocation() {
         return location.get();

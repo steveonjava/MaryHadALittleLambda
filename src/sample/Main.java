@@ -2,13 +2,11 @@ package sample;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
@@ -37,20 +35,20 @@ public class Main extends Application {
 
         // This shows object generation:
         root.getChildren().add(new MapObject.Barn(new Location(2, 3)));
-        // This one shows filtering
-        root.getChildren().add(new MapObject.Rainbow(new Location(5, 0)));
-        // This one demonstrates the additions to the List API:
-        root.getChildren().add(new MapObject.Church(new Location(6, 2)));
-        // This demonstrates Map:
-        root.getChildren().add(new MapObject.ChickenCoop(new Location(5, 4)));
-        // And this one FlatMap:
-        root.getChildren().add(new MapObject.Nest(new Location(3, 5)));
-        // And finally aggregation:
-        MapObject.Fox fox = new MapObject.Fox(new Location(9, 4));
-        fox.setDirection(Direction.LEFT);
-        fox.setScaleX(.5);
-        fox.setScaleY(.5);
-        root.getChildren().add(fox);
+//        // This one shows filtering
+//        root.getChildren().add(new MapObject.Rainbow(new Location(5, 0)));
+//        // This one demonstrates the additions to the List API:
+//        root.getChildren().add(new MapObject.Church(new Location(6, 2)));
+//        // This demonstrates Map:
+//        root.getChildren().add(new MapObject.ChickenCoop(new Location(5, 4)));
+//        // And this one FlatMap:
+//        root.getChildren().add(new MapObject.Nest(new Location(3, 4)));
+//        // And finally aggregation:
+//        MapObject.Fox fox = new MapObject.Fox(new Location(9, 4));
+//        fox.setDirection(Direction.LEFT);
+//        fox.setScaleX(.5);
+//        fox.setScaleY(.5);
+//        root.getChildren().add(fox);
 
         SpriteView.Mary mary = new SpriteView.Mary(new Location(0, 3));
         populateCells(root, mary);
@@ -69,30 +67,21 @@ public class Main extends Application {
     }
     private void populateCells(Group root, final SpriteView.Mary mary) {
         // Gratuitous use of lambdas to do nested iteration!
-//        for (int i = 0; i < HORIZONTAL_CELLS; i++) {
-//            for (int j = 0; j < VERTICAL_CELLS; j++) {
-        Group cells = new Group(IntStream.range(0, HORIZONTAL_CELLS).mapToObj(i ->
+        Group cells = new Group();
+        IntStream.range(0, HORIZONTAL_CELLS).mapToObj(i ->
             IntStream.range(0, VERTICAL_CELLS).mapToObj(j -> {
                 Rectangle rect = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
                 rect.setFill(Color.rgb(0, 0, 0, 0));
                 rect.setStrokeType(StrokeType.INSIDE);
                 rect.setStroke(Color.BLACK);
-// This is too slow on mobile devices
-//                rect.getStrokeDashArray().setAll(0.7 * CELL_SIZE / 4, 0.3 * CELL_SIZE / 4);
-//                rect.setStrokeDashOffset(0.35 * CELL_SIZE / 4);
-                rect.setOnMousePressed(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent mouseEvent) {
-                        mary.moveTo(new Location(i, j));
-                    }
-                });
+                rect.setOnMousePressed(e -> mary.moveTo(new Location(i, j)));
                 return rect;
             })
-        ).flatMap(s -> s).toArray(Rectangle[]::new));
-        root.getChildren().addAll(cells);
+        ).flatMap(s -> s).forEach(cells.getChildren()::add);
+        root.getChildren().add(cells);
     }
 
-    private void addKeyHandler(Scene scene, SpriteView mary) {
+    private void addKeyHandler(Scene scene, SpriteView.Shepherd mary) {
         scene.addEventHandler(KeyEvent.KEY_PRESSED, ke -> {
             KeyCode keyCode = ke.getCode();
             switch (keyCode) {
@@ -175,6 +164,13 @@ public class Main extends Application {
             } else {
                 return (loc.cell_y > cell_y) ? Direction.DOWN : Direction.UP;
             }
+        }
+        @Override
+        public String toString() {
+            return "Location{" +
+                "cell_x=" + cell_x +
+                ", cell_y=" + cell_y +
+                '}';
         }
     }
 
