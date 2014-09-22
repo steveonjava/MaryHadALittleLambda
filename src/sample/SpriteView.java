@@ -86,8 +86,8 @@ public class SpriteView extends StackPane {
             if (walking != null && walking.getStatus().equals(Animation.Status.RUNNING))
                 return;
             moveTo(location.getValue().offset(direction.getXOffset(), direction.getYOffset()));
-            animals.stream().reduce(
-                location.get(),                (loc, sprt) -> {
+            animals.stream().reduce(location.get(),
+                (loc, sprt) -> {
                     sprt.moveTo(loc);
                     return sprt.location.get();
                 }, (loc1, loc2) -> loc1);
@@ -211,7 +211,10 @@ public class SpriteView extends StackPane {
         this.location.set(loc);
         setTranslateX(loc.getX() * Main.CELL_SIZE);
         setTranslateY(loc.getY() * Main.CELL_SIZE);
-        ChangeListener<Object> updateImage = (ov, o, o2) -> imageView.setViewport(new Rectangle2D(frame.get() * spriteWidth, direction.get().getOffset() * spriteHeight, spriteWidth, spriteHeight));
+        ChangeListener<Object> updateImage = (ov, o, o2) -> imageView.setViewport(
+            new Rectangle2D(frame.get() * spriteWidth,
+                direction.get().getOffset() * spriteHeight,
+                spriteWidth, spriteHeight));
         direction.addListener(updateImage);
         frame.addListener(updateImage);
         spriteWidth = (int) (spriteSheet.getWidth() / 3);
@@ -231,7 +234,8 @@ public class SpriteView extends StackPane {
     }
     public void moveTo(Main.Location loc) {
         walking = new Timeline(Animation.INDEFINITE,
-            new KeyFrame(Duration.seconds(.01), new KeyValue(direction, location.getValue().directionTo(loc))),
+            new KeyFrame(Duration.seconds(.001), new KeyValue(direction, location.getValue().directionTo(loc))),
+            new KeyFrame(Duration.seconds(.002), new KeyValue(location, loc)),
             new KeyFrame(Duration.seconds(1), new KeyValue(translateXProperty(), loc.getX() * Main.CELL_SIZE)),
             new KeyFrame(Duration.seconds(1), new KeyValue(translateYProperty(), loc.getY() * Main.CELL_SIZE)),
             new KeyFrame(Duration.seconds(.25), new KeyValue(frame, 0)),
@@ -240,7 +244,6 @@ public class SpriteView extends StackPane {
             new KeyFrame(Duration.seconds(1), new KeyValue(frame, 1))
         );
         walking.setOnFinished(e -> {
-            location.setValue(loc);
             if (arrivalHandler != null) {
                 arrivalHandler.handle(e);
             }

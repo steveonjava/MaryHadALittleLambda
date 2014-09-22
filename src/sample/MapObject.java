@@ -121,7 +121,7 @@ public abstract class MapObject extends SpriteView {
     public static class Fox extends MapObject {
         // Image by PinedaVX: http://www.rpgmakervx.net/index.php?showtopic=9422
         static final Image FOX = loadImage("images/fox.png");
-        public Fox(Main.Location loc) {
+        public  Fox(Main.Location loc) {
             super(FOX, loc);
             startAnimation();
         }

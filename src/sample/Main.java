@@ -35,20 +35,20 @@ public class Main extends Application {
 
         // This shows object generation:
         root.getChildren().add(new MapObject.Barn(new Location(2, 3)));
-//        // This one shows filtering
-//        root.getChildren().add(new MapObject.Rainbow(new Location(5, 0)));
-//        // This one demonstrates the additions to the List API:
-//        root.getChildren().add(new MapObject.Church(new Location(6, 2)));
-//        // This demonstrates Map:
-//        root.getChildren().add(new MapObject.ChickenCoop(new Location(5, 4)));
-//        // And this one FlatMap:
-//        root.getChildren().add(new MapObject.Nest(new Location(3, 4)));
-//        // And finally aggregation:
-//        MapObject.Fox fox = new MapObject.Fox(new Location(9, 4));
-//        fox.setDirection(Direction.LEFT);
-//        fox.setScaleX(.5);
-//        fox.setScaleY(.5);
-//        root.getChildren().add(fox);
+        // This one shows filtering
+        root.getChildren().add(new MapObject.Rainbow(new Location(5, 0)));
+        // This one demonstrates the additions to the List API:
+        root.getChildren().add(new MapObject.Church(new Location(6, 2)));
+        // This demonstrates Map:
+        root.getChildren().add(new MapObject.ChickenCoop(new Location(5, 4)));
+        // And this one FlatMap:
+        root.getChildren().add(new MapObject.Nest(new Location(3, 4)));
+        // And finally aggregation:
+        MapObject.Fox fox = new MapObject.Fox(new Location(7, 4));
+        fox.setDirection(Direction.LEFT);
+        fox.setScaleX(.5);
+        fox.setScaleY(.5);
+        root.getChildren().add(fox);
 
         SpriteView.Mary mary = new SpriteView.Mary(new Location(0, 3));
         populateCells(root, mary);
